@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Discover YouTube channels, compare stats, and explore videos using TubeFinder powered by the YouTube Data API v3." />
+  <meta property="og:title" content="TubeFinder - YouTube Channel Search" />
+  <meta property="og:description" content="Search any YouTube channel, view statistics, latest uploads, playlists, and compare creators." />
+  <meta property="og:image" content="https://via.placeholder.com/1200x630?text=TubeFinder" />
+  <title>TubeFinder | YouTube Channel Search</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/responsive.css" />
+</head>
+<body class="dark-mode">
+  <div class="top-loading-bar" id="topLoadingBar"></div>
+
+  <div class="api-key-modal" id="apiKeyModal" aria-hidden="true">
+    <div class="modal-backdrop"></div>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="apiKeyModalTitle">
+      <div class="modal-header">
+        <h2 id="apiKeyModalTitle">Enter your YouTube API key</h2>
+        <p>TubeFinder requires the YouTube Data API v3 key to search channels and load stats.</p>
+      </div>
+      <div class="modal-body">
+        <label for="apiKeyInput">Enter your YouTube Data API v3 key</label>
+        <input type="text" id="apiKeyInput" placeholder="AIza..." autocomplete="off" />
+        <div class="modal-actions">
+          <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener noreferrer">How to get API key?</a>
+          <button class="btn btn-primary" id="saveApiKeyButton">Save Key</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <header class="navbar">
+    <div class="navbar-left">
+      <div class="brand">
+        <span class="brand-icon"><i class="fa-solid fa-play"></i></span>
+        <span>TubeFinder</span>
+      </div>
+    </div>
+    <div class="navbar-center">
+      <span class="quota-badge hidden" id="quotaBadge"><i class="fa-solid fa-exclamation-triangle"></i> Quota Warning</span>
+    </div>
+    <div class="navbar-right">
+      <button class="icon-button" id="compareButton" type="button"><i class="fa-solid fa-scale-balanced"></i> Compare</button>
+      <button class="icon-button" id="themeToggle" type="button"><i class="fa-solid fa-moon"></i></button>
+    </div>
+  </header>
+
+  <main class="page-container">
+    <section class="hero-section">
+      <div class="hero-content">
+        <h1>Discover YouTube Channels</h1>
+        <p>Search any channel, explore stats & videos</p>
+        <div class="search-form">
+          <div class="search-input-group">
+            <span class="search-icon"><i class="fa-brands fa-youtube"></i></span>
+            <input type="text" id="searchInput" placeholder="Search channel name or @handle..." autocomplete="off" />
+            <button class="clear-button hidden" id="clearSearchButton" type="button"><i class="fa-solid fa-xmark"></i></button>
+          </div>
+          <button class="btn btn-search" id="searchButton" type="button">Search</button>
+        </div>
+        <div class="search-dropdown hidden" id="searchDropdown"></div>
+        <div class="history-bar" id="historyBar"></div>
+      </div>
+    </section>
+
+    <section class="results-section hidden" id="searchResultsSection">
+      <div class="section-header">
+        <h2>Channel results</h2>
+      </div>
+      <div class="results-grid" id="searchResultsList"></div>
+    </section>
+
+    <section class="profile-section hidden" id="channelProfileSection">
+      <div class="profile-card" id="channelBannerContainer"></div>
+      <div class="channel-header" id="channelHeaderContainer"></div>
+      <div class="tab-controls" id="tabControls"></div>
+      <div class="tab-content" id="tabVideos"></div>
+      <div class="tab-content hidden" id="tabAbout"></div>
+      <div class="tab-content hidden" id="tabPlaylists"></div>
+      <div class="tab-content hidden" id="tabStats"></div>
+      <div class="tab-content hidden" id="tabTopVideos"></div>
+    </section>
+
+    <section class="compare-section hidden" id="compareSection">
+      <div class="compare-header">
+        <h2>Compare Channels</h2>
+        <button class="btn btn-secondary" id="exitCompareButton" type="button">Exit Compare</button>
+      </div>
+      <div class="compare-split" id="compareSplit"></div>
+      <div class="compare-result hidden" id="compareResultSection"></div>
+    </section>
+
+    <div class="skeleton-container hidden" id="skeletonUI">
+      <div class="skeleton-header">
+        <div class="skeleton-circle"></div>
+        <div class="skeleton-lines">
+          <div class="skeleton-line short"></div>
+          <div class="skeleton-line medium"></div>
+          <div class="skeleton-line long"></div>
+        </div>
+      </div>
+      <div class="skeleton-grid">
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+      </div>
+    </div>
+
+    <div class="error-panel hidden" id="errorPanel"></div>
+  </main>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <footer class="footer">
+    <div>
+      <span>Built with YouTube Data API v3</span>
+      <a href="https://developers.google.com/youtube/v3" target="_blank" rel="noopener noreferrer">YouTube API Terms</a>
+    </div>
+    <div>
+      <button class="btn btn-link" id="footerChangeKey">Change API Key</button>
+      <button class="icon-button" id="footerThemeToggle" type="button"><i class="fa-solid fa-circle-half-stroke"></i></button>
+      <a href="#" target="_blank" rel="noopener noreferrer">Created by Your Name</a>
+    </div>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="js/api.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/channel.js"></script>
+  <script src="js/videos.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
